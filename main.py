@@ -21,10 +21,11 @@ def check_auth(ch):
 
 
 def get_creds(ch):
+    check_auth(ch)
     return {
-        'user_id': ch.HEADERS.get("CH-UserID"),
-        'user_token': ch.HEADERS.get("Authorization"),
-        'user_device': ch.HEADERS.get("CH-DeviceId"),
+        'user_id': ch.HEADERS["CH-UserID"],
+        'user_token': ch.HEADERS["Authorization"].replace('Token', '').strip(),
+        'user_device': ch.HEADERS["CH-DeviceId"],
     }
 
 
@@ -57,15 +58,15 @@ async def websocket_endpoint(websocket: WebSocket):
         try:
             logger.info(f'Got method "{method}" with params "{params}"')
             if method == 'authenticate':
+                params[1] = str(params[1] or '').replace('Token', '').strip()
                 ch = Clubhouse(*params)
                 # just test authorization
-                check_auth(ch)
-                logger.info(f'Updating creds for user #{params[0]}')
                 await websocket.send_json({
                     'id': 'auth',
                     'result': get_creds(ch),
                     'error': None
                 })
+                logger.info(f'Updating creds for user #{params[0]}')
                 continue
             response = await loop.run_in_executor(None, lambda: getattr(ch, method)(*params))
         except AttributeError as e:
