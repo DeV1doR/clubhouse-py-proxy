@@ -1,0 +1,5 @@
+fastapi[all]==0.63.0
+uvicorn[standard]==0.13.4
+clubhouse-py==304.0.1
+ipdb==0.12.2
+jedi==0.17.2

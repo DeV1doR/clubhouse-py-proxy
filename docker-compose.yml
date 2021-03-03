@@ -1,0 +1,14 @@
+version: '3'
+services:
+  clubhouse_py_proxy:
+    container_name: clubhouse_py_proxy
+    build:
+      context: .
+    restart: always
+    stdin_open: true
+    tty: true
+    command: uvicorn main:app --host 0.0.0.0 --port 8888 --reload
+    volumes:
+      - .:/app
+    ports:
+      - "8888:8888"
